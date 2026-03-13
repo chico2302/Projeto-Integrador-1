@@ -1,8 +1,9 @@
 # Projeto-Integrador-1
 ## Tabagismo e a Sobriedade
 
-O tabagismo é um dos maiores causadores de mortes evitáveis no Brasil e no mundo, estando associado a diversas doenças, como câncer e problemas respiratórios. A dependência do cigarro pode surgir rapidamente, enquanto abandonar o vício costuma ser um grande desafio, especialmente entre jovens (INCA, 2026). Além disso, a indústria do tabaco é frequentemente criticada por utilizar estratégias consideradas maliciosas para atrair novos consumidores. Como consequência, o tabagismo gera prejuízos tanto para os fumantes quanto para o sistema público de saúde.
+O tabagismo é um dos maiores causadores de mortes evitáveis no Brasil e no mundo, estando associado a diversas doenças graves, como câncer, problemas respiratórios e doenças cardiovasculares. A dependência da nicotina pode surgir rapidamente, principalmente entre jovens que iniciam o consumo ainda na adolescência. No entanto, abandonar o vício costuma ser um processo difícil, pois o cigarro provoca forte dependência física e psicológica, exigindo esforço, apoio e conscientização para que o indivíduo alcance a sobriedade e melhore sua qualidade de vida (INCA, 2026).
 
+Além disso, a indústria do tabaco é frequentemente criticada por utilizar estratégias consideradas maliciosas para atrair novos consumidores, muitas vezes associando o cigarro a ideias de liberdade, status e aceitação social. Como consequência, o tabagismo gera prejuízos não apenas para os fumantes, que enfrentam diversos problemas de saúde, mas também para o sistema público de saúde, que precisa lidar com altos custos no tratamento de doenças causadas pelo consumo de tabaco
 ## Aplicativo de Apoio à Superação do Tabagismo
 
 Este projeto propõe a ideia de um aplicativo que auxilie pessoas no processo de parar de fumar utilizando elementos de gamificação. A proposta busca ir além de funcionalidades comuns presentes em aplicativos desse tipo, como somente contadores de dias sem fumar ou cálculo de economia financeira.
