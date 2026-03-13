@@ -6,3 +6,7 @@ Este projeto propõe a ideia de um aplicativo que auxilie pessoas no processo de
 A ideia central é aplicar mecânicas inspiradas em jogos, como recompensas, progresso e desafios, para aumentar o engajamento dos usuários e incentivá-los a manter a continuidade no processo de abandono do tabagismo.
 
 O trabalho tem como objetivo explorar como a gamificação pode ser utilizada no desenvolvimento de aplicações digitais voltadas ao apoio na cessação do tabagismo.
+
+## Referências:
+INSTITUTO NACIONAL DE CÂNCER JOSÉ ALENCAR GOMES DA SILVA. Tabagismo. Disponível em: https://www.gov.br/inca/pt-br/assuntos/causas-e-prevencao-do-cancer/tabagismo. Acesso em: 5 mar. 2026.
+
