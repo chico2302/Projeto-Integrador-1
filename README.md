@@ -53,5 +53,5 @@ Como ferramenta de extensão voltada para a comunidade técnica, acadêmica e de
 
 ## Integrantes
 
-Artur Feitoza de Lima Rodrigues || RA: 22401202
-Francisco Barbosa Ribeiro || RA: 22408832
+* Artur Feitoza de Lima Rodrigues || RA: 22401202
+* Francisco Barbosa Ribeiro || RA: 22408832
