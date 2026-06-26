@@ -47,6 +47,3 @@ Como ferramenta de extensão voltada para a comunidade técnica, acadêmica e de
 * **Democratização dos Dados:** Transformou arquivos e planilhas complexas em gráficos dinâmicos e fluidos, permitindo que qualquer pesquisador filtre e cruze dados históricos em poucos segundos.
 * **Apoio a Políticas Públicas:** A velocidade e a autonomia oferecidas pelo painel agilizam o desenho de panoramas epidemiológicos reais, servindo de evidência prática para apoiar decisões na saúde pública e pesquisas científicas.
 
-### Sugestões de Evolução do Projeto
-Para futuras atualizações do sistema, identificou-se o valor de implementar:
-1. **Filtros Regionais:** Inclusão de recortes por estados ou regiões geográficas para análises epidemiológicas localizadas.
