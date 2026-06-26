@@ -2,7 +2,6 @@
 
 Este projeto consiste em um sistema de monitoramento epidemiológico que transforma dados brutos sobre o tabagismo no Brasil em um painel interativo, dinâmico e de fácil leitura. O foco principal é cruzar a série histórica de óbitos com o impacto de políticas públicas e da carga tributária (IPI) ao longo dos anos.
 
----
 
 ## Sobre a Implementação
 
@@ -19,7 +18,7 @@ O sistema foi estruturado seguindo o padrão arquitetural **MVT (Model-View-Temp
 * **HTML5 & CSS3 Nativos:** Estruturação baseada em contêineres semânticos como `main`, `aside`, `section` e `footer`. O layout utiliza sistemas de **CSS Grid** (bidimensional) e **Flexbox** (unidimensional) para garantir responsividade total em computadores e celulares, eliminando o uso de frameworks externos pesados. O painel opera em *Dark Mode* nativo para reduzir a fadiga visual.
 * **Chart.js (via CDN):** Biblioteca gráfica baseada na API HTML5 Canvas, utilizada para renderizar múltiplos gráficos simultâneos (linhas temporais, barras verticais e roscas proporcionais) com transições fluidas e eixos automatizados.
 
----
+
 
 ## Impactos Representados sobre a Temática
 
@@ -29,7 +28,7 @@ O grande diferencial deste dashboard é a sua capacidade de ilustrar e correlaci
 * **Marcos Regulatórios e a Linha de Base:** Ao sobrepor eventos históricos (como leis antifumo, restrições publicitárias e tratados internacionais da OMS) à série temporal de mortes absolutas, o pesquisador consegue analisar os impactos na redução ou estabilização de óbitos por patologias severas, como o *"Câncer de traqueia, brônquios e pulmão"*.
 * **Resposta Dinâmica a Períodos Críticos:** A esteira rígida de processamento do sistema permite que, a cada alteração dos seletores temporais "De" ou "Até" pelo usuário, o backend valide o intervalo, ignore dados nulos ou corrompidos e recalcule instantaneamente o somatório matemático completo (`sum`) sobre o período escolhido. Isso expõe com clareza quais intervalos responderam melhor às ações de controle.
 
----
+
 
 ## Uso de Inteligência Artificial como Apoio
 
@@ -38,7 +37,7 @@ Em conformidade com as boas práticas de desenvolvimento e diretrizes institucio
 * **Frentes de Atuação:** O uso concentrou-se no apoio à otimização de sintaxes lógicas no Pandas, parametrização de eixos lineares estritos para o Chart.js e suporte no refinamento estético e padronização textual desta documentação técnica.
 * **Governança:** Toda a tomada de decisão arquitetural, validação de segurança, higienização de dados e modelagem das regras de negócio epidemiológicas foram conduzidas, revisadas e homologadas integralmente de forma humana pelos desenvolvedores responsáveis.
 
----
+
 
 ## Visualização Final e Resultados (Perspectiva de Pesquisa)
 
