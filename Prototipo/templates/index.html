@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inteligência de Dados - Tabagismo</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-card-full { background-color: #1a1a1a; padding: 20px; border-radius: 8px; border: 1px solid #333; margin-top: 20px; width: 100%; }
+        .dashboard-grid-secondary { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        @media (max-width: 1024px) { .dashboard-grid-secondary { grid-template-columns: 1fr; } }
+        .fontes-container { background-color: #1a1a1a; padding: 25px; border-radius: 8px; border: 1px solid #333; color: #ffffff; }
+        .fonte-item { margin-bottom: 22px; padding-bottom: 15px; border-bottom: 1px solid #2a2a2a; }
+        .fonte-item:last-child { border-bottom: none; }
+        .filter-select { background-color: #2b2b2b; color: #ffffff; border: 1px solid #444; padding: 6px 12px; border-radius: 4px; cursor: pointer; outline: none; font-size: 0.9rem; }
+        .app-footer { margin-top: 40px; padding: 20px 0; border-top: 1px solid #333; text-align: center; color: #828282; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="logo"><h2>Dashboard Tabagismo</h2></div>
+            <nav>
+                <ul role="tablist" style="list-style: none; padding: 0;">
+                    <li><button id="btn-dashboard" class="nav-btn active" onclick="showTab('dashboard')">Painel Analítico</button></li>
+                    <li><button id="btn-dados" class="nav-btn" onclick="showTab('dados-brutos')">Dados Brutos (CSV)</button></li>
+                    <li><button id="btn-fontes" class="nav-btn" onclick="showTab('fontes')">Fontes Oficiais</button></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content" style="display: flex; flex-direction: column; min-height: 100vh; padding: 20px; background-color: #1c1c1c;">
+
+            <div style="flex: 1;">
+                
+                <div id="tab-dashboard" class="tab-content active">
+
+                    <header class="dashboard-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding-bottom: 20px; margin-bottom: 25px; flex-wrap: wrap; gap: 20px;">
+                        <div class="header-title" style="flex: 1; min-width: 300px;">
+                            <h1 class="mt-6 text-2xl font-bold">Análise Epidemiológica Histórica</h1>
+                        </div>
+
+                        <form method="GET" action="/" id="form-filtros" style="display: flex; align-items: center; gap: 20px; background-color: #1a1a1a; padding: 12px 20px; border-radius: 8px; border: 1px solid #333; flex-wrap: wrap;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <label for="ano_min" style="color: #f2c94c; font-weight: bold; font-size: 0.9rem;">De:</label>
+                                <select name="ano_min" id="ano_min" onchange="submeterFiltros()" class="filter-select">
+                                    {% for ano in range(1980, 2024) %}
+                                        <option value="{{ ano }}" {% if ano == ano_min %}selected{% endif %}>{{ ano }}</option>
+                                    {% endfor %}
+                                </select>
+
+                                <label for="ano_max" style="color: #f2c94c; font-weight: bold; font-size: 0.9rem;">Até:</label>
+                                <select name="ano_max" id="ano_max" onchange="submeterFiltros()" class="filter-select">
+                                    {% for ano in range(1980, 2024) %}
+                                        <option value="{{ ano }}" {% if ano == ano_max %}selected{% endif %}>{{ ano }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </form>
+                    </header>
+
+                    <section class="cards-grid" style="display: flex; gap: 20px; width: 100%; justify-content: space-between; margin-bottom: 25px; flex-wrap: wrap;">
+                        <div class="card" style="flex: 1; min-width: 200px; background-color: #8B0000; color: #ffffff; padding: 20px; border-radius: 8px;">
+                            <span style="display: block; font-size: 0.9rem; opacity: 0.9; margin-bottom: 10px; font-weight: bold;">Óbitos Acumulados no Período ({{ ano_min }} - {{ ano_max }})</span>
+                            <h2 style="font-size: 2rem; margin: 0;">{{ dados_cards.total_mortes }}</h2>
+                        </div>
+                        <div class="card" style="flex: 1; min-width: 200px; background-color: #CC9900; color: #ffffff; padding: 20px; border-radius: 8px;">
+                            <span style="display: block; font-size: 0.9rem; opacity: 0.9; margin-bottom: 10px; font-weight: bold;">Nº Estimado de Fumantes Recente</span>
+                            <h2 style="font-size: 2rem; margin: 0;">{{ graficos.novos_fumantes_milhoes[-1] }} Milhões</h2>
+                        </div>
+                        <div class="card" style="flex: 1; min-width: 200px; background-color: #5C4033; color: #ffffff; padding: 20px; border-radius: 8px;">
+                            <span style="display: block; font-size: 0.9rem; opacity: 0.9; margin-bottom: 10px; font-weight: bold;">Alvo de Prevalência (OMS)</span>
+                            <h2 style="font-size: 2rem; margin: 0;">{{ dados_cards.meta_oms }}</h2>
+                        </div>
+                    </section>
+
+                    <div class="chart-card-full">
+                        <h3>Tendência Temporal Filtrada: Óbitos Totais por Causas Relacionadas</h3>
+                        <div class="chart-container" style="height: 350px; position: relative;">
+                            <canvas id="graficoTendencia"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card-full">
+                        <h3>Deep-Dive Monitorado: Mortalidade por Câncer de Pulmão no Período Escolhido</h3>
+                        <div class="chart-container" style="height: 320px; position: relative;">
+                            <canvas id="graficoIhmeCancer"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-grid-secondary">
+                        <div class="chart-card-full" style="margin-top: 0;">
+                            <h3>Composição Relativa Dinâmica das Causas de Óbito (Ref: {{ graficos.ano_recente }})</h3>
+                            <div class="chart-container" style="height: 300px; position: relative;">
+                                <canvas id="graficoProporcao"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-card-full" style="margin-top: 0;">
+                            <h3>Total de Fumantes Estimados no Brasil (Linha de Base Global)</h3>
+                            <div class="chart-container" style="height: 300px; position: relative;">
+                                <canvas id="graficoTotalFumantesBarras"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="chart-card-full">
+                        <h3>Prevalência Percentual Histórica de Fumantes no Brasil</h3>
+                        <div class="chart-container" style="height: 320px; position: relative;">
+                            <canvas id="graficoHistoricoPoliticas"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-card-full">
+                        <h3>Percentual de Fumantes x IPI Aproximado</h3>
+                        <div class="chart-container" style="height: 320px; position: relative;">
+                            <canvas id="graficoIpiFumantes"></canvas>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div id="tab-dados-brutos" class="tab-content" style="display: none;">
+                    <div class="section-header"><h2>Dados Brutos Filtrados</h2><button class="btn-back" onclick="showTab('dashboard')">Voltar ao Painel</button></div>
+                    <div class="table-grid-yellow">
+                        <div class="row header"><span>Ano</span><span>Causa Patológica</span><span>Estimativa de Óbitos</span></div>
+                        <div class="table-body" style="max-height: 500px; overflow-y: auto;">
+                            {% for r in dados_tabela %}
+                                <div class="row"><span>{{ r.year }}</span><span>{{ r.cause }}</span><span>{{ r.val }}</span></div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div id="tab-fontes" class="tab-content" style="display: none;">
+                    <div class="fontes-container">
+                        <h2 style="margin-bottom: 25px; border-bottom: 1px solid #333; padding-bottom: 10px;">Referências e Metadados Oficiais</h2>
+                        
+                        <div class="fonte-item">
+                            <h3 style="color: #f2c94c; margin-bottom: 8px;">INCA – Controle do Tabagismo no Brasil</h3>
+                            <p style="margin-bottom: 12px; color: #e0e0e0;">Programas, ações educativas e publicações do Instituto Nacional de Câncer (INCA) voltadas à rede de tratamento do tabagismo no SUS.</p>
+                            <a href="https://ninho.inca.gov.br/jspui/handle/123456789/2062" target="_blank" style="color: #f2c94c; text-decoration: none; font-weight: bold; border-bottom: 1px dashed #f2c94c; padding-bottom: 2px;">Acessar Repositório INCA &rarr;</a>
+                        </div>
+                        
+                        <div class="fonte-item">
+                            <h3 style="color: #f2c94c; margin-bottom: 8px;">Our World in Data – Smoking</h3>
+                            <p style="margin-bottom: 12px; color: #e0e0e0;">Estatísticas e pesquisas globais atualizadas sobre a prevalência de fumantes, impacto demográfico e mortes prematuras atribuíveis ao tabaco.</p>
+                            <a href="https://ourworldindata.org/smoking" target="_blank" style="color: #f2c94c; text-decoration: none; font-weight: bold; border-bottom: 1px dashed #f2c94c; padding-bottom: 2px;">Acessar Our World in Data &rarr;</a>
+                        </div>
+                        
+                        <div class="fonte-item">
+                            <h3 style="color: #f2c94c; margin-bottom: 8px;">TABNET DATASUS</h3>
+                            <p style="margin-bottom: 12px; color: #e0e0e0;">Tabulador genérico do Departamento de Informática do SUS para geração de dados consolidados sobre saúde pública e mortalidade no Brasil.</p>
+                            <a href="https://datasus.saude.gov.br/" target="_blank" style="color: #f2c94c; text-decoration: none; font-weight: bold; border-bottom: 1px dashed #f2c94c; padding-bottom: 2px;">Acessar Portal DATASUS &rarr;</a>
+                        </div>
+                        
+                        <div class="fonte-item">
+                            <h3 style="color: #f2c94c; margin-bottom: 8px;">VizHub (IHME - GBD Results)</h3>
+                            <p style="margin-bottom: 12px; color: #e0e0e0;">Ferramenta iterativa global do Institute for Health Metrics and Evaluation usada para explorar fatores de risco, cargas de doenças e causas de óbitos.</p>
+                            <a href="https://vizhub.healthdata.org/gbd-results/" target="_blank" style="color: #f2c94c; text-decoration: none; font-weight: bold; border-bottom: 1px dashed #f2c94c; padding-bottom: 2px;">Visualizar Dados no VizHub &rarr;</a>
+                        </div>
+                        
+                        <div class="fonte-item">
+                            <h3 style="color: #f2c94c; margin-bottom: 8px;">Receita Federal - Tributação de Cigarros</h3>
+                            <p style="margin-bottom: 12px; color: #e0e0e0;">Regimes e controles especiais, alíquotas do IPI (ad valorem e específica) e atualizações sobre o preço mínimo de venda a varejo.</p>
+                            <a href="https://www.gov.br/receitafederal/pt-br/assuntos/orientacao-tributaria/regimes-e-controles-especiais/cigarros-tributacao" target="_blank" style="color: #f2c94c; text-decoration: none; font-weight: bold; border-bottom: 1px dashed #f2c94c; padding-bottom: 2px;">Consultar Legislação da Receita Federal &rarr;</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <footer class="app-footer"><p>&copy; 2026 Dashboard de Inteligência de Dados - Análise de Saúde Pública</p></footer>
+        </main>
+    </div>
+
+    <script>
+        function submeterFiltros() {
+            document.getElementById('form-filtros').submit();
+        }
+
+        function showTab(tabName) {
+            const tabs = {'dashboard': document.getElementById('tab-dashboard'), 'dados-brutos': document.getElementById('tab-dados-brutos'), 'fontes': document.getElementById('tab-fontes')};
+            Object.keys(tabs).forEach(key => { if(tabs[key]) tabs[key].style.display = 'none'; });
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            if (tabs[tabName]) tabs[tabName].style.display = 'block';
+            const activeBtn = document.getElementById('btn-' + (tabName === 'dados-brutos' ? 'dados' : tabName));
+            if (activeBtn) activeBtn.classList.add('active');
+        }
+
+        // 1. GRAFICO TENDENCIA
+        new Chart(document.getElementById('graficoTendencia').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: {{ graficos.anos | tojson | safe }},
+                datasets: [{ label: 'Óbitos Totais Acumulados', data: {{ graficos.valores | tojson | safe }}, borderColor: '#1f77b4', backgroundColor: 'transparent', borderWidth: 3, pointBackgroundColor: '#1f77b4', pointRadius: 4 }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#ffffff' } }, tooltip: { enabled: true, displayColors: false } }, scales: { y: { grid: { color: '#2a2a2a' }, ticks: { color: '#a0a0a0' } }, x: { grid: { color: '#2a2a2a' }, ticks: { color: '#a0a0a0' } } } }
+        });
+
+        // 2. GRAFICO DE CÂNCER
+        new Chart(document.getElementById('graficoIhmeCancer').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: {{ graficos.anos | tojson | safe }},
+                datasets: [{ label: 'Óbitos por Câncer de Pulmão', data: {{ graficos.valores_cancer | tojson | safe }}, borderColor: '#d62728', backgroundColor: 'rgba(214, 39, 40, 0.04)', borderWidth: 2.5, fill: true }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#ffffff' } }, tooltip: { enabled: true, displayColors: false } }, scales: { y: { grid: { color: '#2a2a2a' }, ticks: { color: '#a0a0a0' } }, x: { grid: { color: '#2a2a2a' }, ticks: { color: '#a0a0a0' } } } }
+        });
+
+        // 3. COMPOSIÇÃO RELATIVA
+        new Chart(document.getElementById('graficoProporcao').getContext('2d'), {
+            type: 'doughnut',
+            data: { labels: {{ graficos.top_nomes | tojson | safe }}, datasets: [{ data: {{ graficos.top_valores | tojson | safe }}, backgroundColor: ['#eb5757', '#f2c94c', '#f2994a', '#bb6bd9', '#2f80ed'], borderWidth: 0 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { color: '#ffffff', font: { size: 10 } } }, tooltip: { enabled: true, displayColors: false } } }
+        });
+
+        // 4. PERCENTUAL DE FUMANTES HISTÓRICO
+        new Chart(document.getElementById('graficoHistoricoPoliticas').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: {{ graficos.historico_anos | tojson | safe }},
+                datasets: [{ label: 'Prevalência de Fumantes (%)', data: {{ graficos.historico_percentual | tojson | safe }}, borderColor: '#f2c94c', backgroundColor: 'rgba(242, 201, 76, 0.1)', borderWidth: 3, pointRadius: 6 }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#ffffff' } }, tooltip: { backgroundColor: '#121212', titleColor: '#f2c94c', bodyColor: '#ffffff', padding: 12, displayColors: false } }, scales: { y: { beginAtZero: true, grid: { color: '#2a2a2a' }, ticks: { color: '#a0a0a0' } }, x: { grid: { color: '#2a2a2a' }, ticks: { color: '#a0a0a0' } } } }
+        });
+
+        // 5. TOTAL DE FUMANTES EM BARRAS
+        new Chart(document.getElementById('graficoTotalFumantesBarras').getContext('2d'), {
+            type: 'bar',
+            data: { labels: {{ graficos.novos_anos | tojson | safe }}, datasets: [{ label: 'Fumantes (Milhões)', data: {{ graficos.novos_fumantes_milhoes | tojson | safe }}, backgroundColor: '#eb5757', borderRadius: 4 }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: { color: '#ffffff' } }, tooltip: { enabled: true, displayColors: false } }, scales: { y: { grid: { color: '#2a2a2a' }, ticks: { color: '#a0a0a0' } }, x: { grid: { color: '#1a1a1a' }, ticks: { color: '#a0a0a0' } } } }
+        });
+
+        // 6. PERCENTUAL DE FUMANTES X IPI APROXIMADO (EIXO X = IPI, EIXO Y = FUMANTES)
+        new Chart(document.getElementById('graficoIpiFumantes').getContext('2d'), {
+            type: 'line',
+            data: {
+                datasets: [{
+                    label: 'Relação Preço/Imposto vs Consumo',
+                    data: [
+                        { x: 41.25, y: 34.8 },
+                        { x: 45.0,  y: 29.0 },
+                        { x: 60.0,  y: 22.4 },
+                        { x: 70.0,  y: 18.1 },
+                        { x: 78.0,  y: 12.6 },
+                        { x: 78.0,  y: 13.2 }
+                    ],
+                    borderColor: '#f2994a',
+                    backgroundColor: 'rgba(242, 153, 74, 0.1)',
+                    borderWidth: 3,
+                    pointBackgroundColor: '#eb5757',
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    showLine: true,
+                    tension: 0.1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return `IPI: ${context.parsed.x}% | Fumantes: ${context.parsed.y}%`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        title: {
+                            display: true,
+                            text: 'IPI Aproximado (%)',
+                            color: '#ffffff',
+                            font: { weight: 'bold' }
+                        },
+                        grid: { color: '#2a2a2a' },
+                        ticks: { color: '#a0a0a0' },
+                        min: 35,
+                        max: 85
+                    },
+                    y: {
+                        title: {
+                            display: true,
+                            text: 'Percentual de Fumantes (%)',
+                            color: '#ffffff',
+                            font: { weight: 'bold' }
+                        },
+                        grid: { color: '#2a2a2a' },
+                        ticks: { color: '#a0a0a0' },
+                        min: 5,
+                        max: 40
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
