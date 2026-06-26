@@ -2,6 +2,11 @@
 
 Este projeto consiste em um sistema de monitoramento epidemiológico que transforma dados brutos sobre o tabagismo no Brasil em um painel interativo, dinâmico e de fácil leitura. O foco principal é cruzar a série histórica de óbitos com o impacto de políticas públicas e da carga tributária (IPI) ao longo dos anos.
 
+## Demonstração
+
+📹 **Vídeo de apresentação do dashboard:**
+
+https://drive.google.com/file/d/1tmFymtmTpfKuZu9WmCFNVQQ0t4kjSnaI/view?usp=sharing
 
 ## Sobre a Implementação
 
